@@ -10,12 +10,16 @@ def _enforce_constraints(b_to_a, c_to_a, e, p):
     assert np.all(b_to_a <= 1), "No element of b_to_a can exceed unity"
     assert np.all(c_to_a <= 1), "No element of c_to_a can exceed unity"
     assert np.all(b_to_a >= c_to_a), "No element in c_to_a can exceed the corresponding b_to_a"
+    assert np.all(e <= 0.5), "No element of ellipticity can exceed 0.5"
+    assert np.all(p <= 0.5), "No element of prolaticity can exceed 0.5"
+    assert np.all(e >= 0.), "ellipticity must be non-negative"
+    assert np.all(p >= -0.25), "prolaticity cannot exceed -0.25"
 
 
 def test1():
     """Enforce monte_carlo_halo_shapes doesn't crash when given crazy halo masses
     """
-    npts = int(1e4)
+    npts = int(1e5)
     logmhalo = np.linspace(-10, 20, npts)
     b_to_a, c_to_a, e, p = monte_carlo_halo_shapes(logmhalo)
     _enforce_constraints(b_to_a, c_to_a, e, p)
