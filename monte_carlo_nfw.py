@@ -1,32 +1,45 @@
+"""See https://arxiv.org/abs/1805.09550
+"""
 import numpy as np
 from scipy import special
 from scipy.integrate import quad as quad_integration
 
 
-def pnfwunorm(q, con):
+def nfw_profile_realization(conc, seed=43):
+    """Generate a random realization of a dimensionless NFW profile
+    according to the input concentration.
+
+    Parameters
+    ----------
+    conc : ndarray
+        Array of shape (npts, ) storing NFW concentration of the host halo
+
+    Returns
+    -------
+    r : ndarray
+        Array of shape (npts, ) storing radial distances, 0 < r < 1
+    """
+    conc = np.atleast_1d(conc)
+    n = int(conc.size)
+    rng = np.random.RandomState(seed)
+    uran = rng.rand(n)
+    return _qnfw(uran, conc=conc)
+
+
+def _pnfwunorm(q, conc):
     """
     """
-    y = q*con
+    y = q*conc
     return np.log(1.0 + y)-y/(1.0 + y)
 
 
-def qnfw(p, con, logp=False):
+def _qnfw(p, conc, logp=False):
     """
     """
     p[p>1] = 1
     p[p<=0] = 0
-    p *= pnfwunorm(1, con)
-    return (-(1.0/np.real(special.lambertw(-np.exp(-p-1))))-1)/con
-
-
-def rnfw(con, seed=43):
-    """
-    """
-    con = np.atleast_1d(con)
-    n = int(con.size)
-    rng = np.random.RandomState(seed)
-    uran = rng.rand(n)
-    return qnfw(uran, con=con)
+    p *= _pnfwunorm(1, conc)
+    return (-(1.0/np.real(special.lambertw(-np.exp(-p-1))))-1)/conc
 
 
 def _jeans_integrand_term1(y):
@@ -48,7 +61,7 @@ def _g_integral(x):
     return np.log(1.0+x) - (x/(1.0+x))
 
 
-def nfw_velocity_dispersion_table(scaled_radius_table, conc, tol=1e-5):
+def _nfw_velocity_dispersion_table(scaled_radius_table, conc, tol=1e-5):
     """
     """
     x = np.atleast_1d(scaled_radius_table).astype(np.float64)
@@ -67,4 +80,3 @@ def nfw_velocity_dispersion_table(scaled_radius_table, conc, tol=1e-5):
 
     dimless_velocity_table = np.sqrt(result*prefactor)
     return dimless_velocity_table
-
