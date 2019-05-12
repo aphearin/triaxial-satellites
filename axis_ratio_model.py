@@ -1,4 +1,6 @@
-"""
+"""Module implementing the monte_carlo_halo_shapes function that generates
+distributions of halo axis ratios that agree reasonably well with simulations.
+See demo_shape_model.ipynb for some validation plots.
 """
 import numpy as np
 from scipy.stats import gengamma
@@ -10,7 +12,34 @@ c0, c1 = -0.18, 1.35
 
 
 def monte_carlo_halo_shapes(logmhalo, floor=0.05):
-    """Generate axis ratio distributions as a function of halo mass
+    """Generate axis ratio distributions as a function of halo mass.
+
+    Parameters
+    ----------
+    logmhalo : ndarray
+        Array of shape (npts, ) storing log halo mass
+
+    floor : float, optional
+        Floor to impose on the axis ratios. Default is 0.05.
+
+    Returns
+    -------
+    b_to_a : ndarray
+        Array of shape (npts, ) storing halo B/A
+
+    c_to_a : ndarray
+        Array of shape (npts, ) storing halo C/A
+
+    e : ndarray
+        Array of shape (npts, ) storing halo ellipticity
+        e = (1 - c**2)/2L, where L = 1 + b**2 + c**2
+        Defined according to Equation 9 of https://arxiv.org/abs/1109.3709
+
+    p : ndarray
+        Array of shape (npts, ) storing halo prolaticity
+        p = (1 - 2b**2 + c**2)/2L, where L = 1 + b**2 + c**2
+        Defined according to Equation 9 of https://arxiv.org/abs/1109.3709
+
     """
     b_to_a, c_to_a = monte_carlo_axis_ratios(logmhalo, floor=floor)
     s = 1. + b_to_a**2 + c_to_a**2
