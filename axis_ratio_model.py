@@ -48,38 +48,36 @@ def monte_carlo_halo_shapes(logmhalo, floor=0.05):
     return b_to_a, c_to_a, e, p
 
 
-def _sigmoid(x, x0=0, k=1, ymin=0, ymax=1):
-    """
-    """
+def _sigmoid(x, x0, k, ymin, ymax):
     height_diff = ymax-ymin
     return ymin + height_diff/(1 + np.exp(-k*(x-x0)))
 
 
 def monte_carlo_b_to_a(logmhalo):
-    a, c = _get_gengamma_b_to_a_params(logmhalo)
-    return gengamma_b_to_a(a, c)
+    alpha, beta = _get_gengamma_b_to_a_params(logmhalo)
+    return gengamma_b_to_a(alpha, beta)
 
 
-def gengamma_b_to_a(a, c):
-    r = 1-1./(1 + gengamma.rvs(a, c))
+def gengamma_b_to_a(alpha, beta):
+    r = 1-1./(1 + gengamma.rvs(alpha, beta))
     return r
 
 
 def _get_gengamma_b_to_a_params(logmhalo):
-    a = _sigmoid(logmhalo, x0=12.5, k=2, ymin=3.25, ymax=2.25)
-    c = _sigmoid(logmhalo, x0=12.5, k=2, ymin=0.5, ymax=1.25)
-    return a, c
+    alpha = _sigmoid(logmhalo, x0=12.5, k=2, ymin=3.25, ymax=2.25)
+    beta = _sigmoid(logmhalo, x0=12.5, k=2, ymin=0.5, ymax=1.25)
+    return alpha, beta
 
 
 def _get_gengamma_c_to_b_params(logmhalo):
-    a = _sigmoid(logmhalo, x0=12.5, k=2, ymin=3, ymax=2)
-    c = _sigmoid(logmhalo, x0=12.25, k=2, ymin=-5, ymax=-6)
-    return a, c
+    alpha = _sigmoid(logmhalo, x0=12.5, k=2, ymin=3, ymax=2)
+    beta = _sigmoid(logmhalo, x0=12.25, k=2, ymin=-5, ymax=-6)
+    return alpha, beta
 
 
 def monte_carlo_c_to_b(logmhalo):
-    a, c = _get_gengamma_c_to_b_params(logmhalo)
-    return 1.65-gengamma.rvs(a, c)
+    alpha, beta = _get_gengamma_c_to_b_params(logmhalo)
+    return 1.65-gengamma.rvs(alpha, beta)
 
 
 def monte_carlo_axis_ratios(logmhalo, floor=0.05):
